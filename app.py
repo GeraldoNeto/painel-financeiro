@@ -324,7 +324,7 @@ def apply_filters(df_lan, df_ent, sel_months, sel_status, sel_cats):
 
 # ─── KPI CARDS ────────────────────────────────────────────────────────────────
 def render_kpis(df_lan, df_ent, df_lan_full, df_ent_full, sel_months):
-    pend = df_lan[df_lan["pago"].str.lower()]
+    pend = df_lan[df_lan["pago"].str.lower() != ""]
     entradas   = df_ent["valor"].sum()
     a_vencer   = pend["valor"].sum()
     saldo      = entradas - a_vencer
