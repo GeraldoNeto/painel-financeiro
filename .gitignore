@@ -1,5 +1,6 @@
 # Credenciais — NUNCA subir para o GitHub
 .streamlit/secrets.toml
+.claude/settings.local.json
 
 # Python
 __pycache__/
