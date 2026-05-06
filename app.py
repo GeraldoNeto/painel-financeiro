@@ -132,16 +132,36 @@ def _find_ws(wss: dict, *keywords):
             return ws
     return None
 
-def _ws_to_df(ws) -> pd.DataFrame:
-    """Lê a planilha sem quebrar com cabeçalhos vazios ou duplicados."""
+def _ws_to_df(ws, seek=None) -> pd.DataFrame:
+    """Le a planilha localizando a linha de cabecalho correta.
+    seek: lista de keywords normalizadas que devem aparecer na linha de header.
+    """
     if ws is None:
         return pd.DataFrame()
     values = ws.get_all_values()
     if not values or len(values) < 2:
         return pd.DataFrame()
 
-    # Torna os cabeçalhos únicos (resolve colunas vazias ou duplicadas)
-    raw_headers = values[0]
+    def norm(s):
+        import unicodedata
+        return unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower()
+
+    header_idx = 0
+    for i, row in enumerate(values[:-1]):
+        non_empty = [c.strip() for c in row if c.strip()]
+        if len(non_empty) < 3:
+            continue
+        if seek:
+            row_norm = [norm(c) for c in non_empty]
+            if all(any(kw in cell for cell in row_norm) for kw in seek):
+                header_idx = i
+                break
+        else:
+            if len(set(non_empty)) == len(non_empty):
+                header_idx = i
+                break
+
+    raw_headers = values[header_idx]
     seen: dict = {}
     headers = []
     for h in raw_headers:
@@ -154,8 +174,7 @@ def _ws_to_df(ws) -> pd.DataFrame:
             seen[h] = 0
             headers.append(h)
 
-    df = pd.DataFrame(values[1:], columns=headers)
-    # Remove linhas completamente vazias
+    df = pd.DataFrame(values[header_idx + 1:], columns=headers)
     df = df[df.apply(lambda r: r.astype(str).str.strip().ne("").any(), axis=1)]
     return df
 
@@ -165,15 +184,15 @@ def load_data():
     ss     = client.open_by_key(SPREADSHEET_ID)
     wss    = {ws.title: ws for ws in ss.worksheets()}
 
-    ws_lan = _find_ws(wss, "lançamento", "lancamento")
+    ws_lan = _find_ws(wss, "lancamento")
     ws_ent = _find_ws(wss, "entrada")
 
-    df_lan = _ws_to_df(ws_lan)
-    df_ent = _ws_to_df(ws_ent)
+    df_lan = _ws_to_df(ws_lan, seek=["vencimento"])
+    df_ent = _ws_to_df(ws_ent, seek=["responsavel"])
 
-    sheet_names  = list(wss.keys())
-    lan_name     = ws_lan.title if ws_lan else None
-    ent_name     = ws_ent.title if ws_ent else None
+    sheet_names = list(wss.keys())
+    lan_name    = ws_lan.title if ws_lan else None
+    ent_name    = ws_ent.title if ws_ent else None
 
     return df_lan, df_ent, datetime.now(), sheet_names, lan_name, ent_name
 
@@ -516,8 +535,7 @@ def main():
                     "e se a planilha foi compartilhada com o e-mail da conta de serviço.")
             st.stop()
 
-    # ── Diagnóstico (visível sempre que algum dado não for encontrado) ──
-# Diagnostico
+    # Diagnostico
     with st.expander("Diagnostico de conexao", expanded=True):
         col_a, col_b = st.columns(2)
         with col_a:
@@ -532,7 +550,6 @@ def main():
             if not df_ent_raw.empty:
                 cols_ent = " | ".join(df_ent_raw.columns.tolist())
                 st.markdown(f"**Colunas Entradas:** {cols_ent}")
-            
 
     # Pipeline
     df_lan = process_lancamentos(df_lan_raw)
