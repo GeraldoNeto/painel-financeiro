@@ -534,7 +534,7 @@ def main():
             st.info("Verifique se as credenciais estão corretas em `.streamlit/secrets.toml` "
                     "e se a planilha foi compartilhada com o e-mail da conta de serviço.")
             st.stop()
-
+    """
     # Diagnostico
     with st.expander("Diagnostico de conexao", expanded=True):
         col_a, col_b = st.columns(2)
@@ -550,7 +550,7 @@ def main():
             if not df_ent_raw.empty:
                 cols_ent = " | ".join(df_ent_raw.columns.tolist())
                 st.markdown(f"**Colunas Entradas:** {cols_ent}")
-
+    """
     # Pipeline
     df_lan = process_lancamentos(df_lan_raw)
     df_ent = process_entradas(df_ent_raw)
