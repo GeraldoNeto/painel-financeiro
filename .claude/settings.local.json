@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(& C:\\\\Users\\\\gbrit\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python310\\\\python.exe -m streamlit run \"c:/Users/gbrit/Documents/painel-financeiro/painel-financeiro/app.py\")",
+      "PowerShell(& C:\\\\Users\\\\gbrit\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python310\\\\Scripts\\\\streamlit.exe run \"c:/Users/gbrit/Documents/painel-financeiro/painel-financeiro/app.py\")",
+      "PowerShell(Get-Date; \\(Get-Date\\).ToUniversalTime\\(\\))",
+      "PowerShell(w32tm /resync /force)",
+      "PowerShell(Start-Service W32Time)"
+    ]
+  }
+}

@@ -39,32 +39,43 @@ thead tr th { background: #F8FAFC !important; font-size: 11px !important;
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
-    /* KPI cards: 2 por linha */
-    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] {
-        min-width: 46% !important;
-        flex: 1 1 46% !important;
+    /* KPI cards: 2 por linha, centralizados */
+    div[data-testid="stHorizontalBlock"] {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        justify-content: center !important;
     }
-    [data-testid="stMetricValue"] { font-size: 1.1rem !important; }
-    [data-testid="stMetricLabel"] { font-size: 0.68rem !important; }
-    div[data-testid="metric-container"] { padding: 12px 12px; }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] {
+        min-width: calc(48% - 4px) !important;
+        max-width: calc(48% - 4px) !important;
+        flex: 1 1 calc(48% - 4px) !important;
+    }
+    div[data-testid="metric-container"] {
+        text-align: center !important;
+        padding: 10px 8px !important;
+    }
+    [data-testid="stMetricValue"]  { font-size: 1.0rem !important; }
+    [data-testid="stMetricLabel"]  { font-size: 0.63rem !important; }
+    [data-testid="stMetricDelta"]  { font-size: 0.72rem !important; justify-content: center !important; }
 
     /* Sidebar: largura menor para não sobrepor o conteúdo */
-    section[data-testid="stSidebar"] { min-width: 220px !important; max-width: 220px !important; }
+    section[data-testid="stSidebar"] { min-width: 210px !important; max-width: 210px !important; }
 
-    /* Gráficos: empilhar verticalmente */
-    div[data-testid="stHorizontalBlock"]:has(div[data-testid="stPlotlyChart"]) {
-        flex-wrap: wrap !important;
-    }
+    /* Gráficos: empilhar verticalmente com prioridade sobre a regra acima */
     div[data-testid="stHorizontalBlock"]:has(div[data-testid="stPlotlyChart"]) > div[data-testid="stColumn"] {
         min-width: 100% !important;
+        max-width: 100% !important;
         flex: 1 1 100% !important;
     }
 
     /* Título menor */
-    h1 { font-size: 1.4rem !important; }
+    h1 { font-size: 1.3rem !important; text-align: center !important; }
 
     /* Tabelas: scroll horizontal */
     div[data-testid="stDataFrame"] { overflow-x: auto !important; }
+
+    /* Reduzir padding lateral geral */
+    .block-container { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -422,12 +433,14 @@ def render_charts(df_lan_full, df_ent_full, df_lan_filt):
             fig = go.Figure()
             fig.add_bar(x=dh["Mês"], y=dh["Entradas"], name="Entradas",
                         marker_color="#16A34A", opacity=0.85, marker_line_width=0,
-                        text=[fmt_brl(v) for v in dh["Entradas"]], textposition="outside",
-                        textfont=dict(size=10))
+                        text=[fmt_brl(v) for v in dh["Entradas"]],
+                        textposition="inside", insidetextanchor="middle",
+                        textfont=dict(size=10, color="white"))
             fig.add_bar(x=dh["Mês"], y=dh["Gastos"],   name="Gastos/A Vencer",
                         marker_color="#DC2626", opacity=0.85, marker_line_width=0,
-                        text=[fmt_brl(v) for v in dh["Gastos"]], textposition="outside",
-                        textfont=dict(size=10))
+                        text=[fmt_brl(v) for v in dh["Gastos"]],
+                        textposition="inside", insidetextanchor="middle",
+                        textfont=dict(size=10, color="white"))
             fig.update_layout(barmode="group", height=270,
                               margin=dict(l=0, r=0, t=8, b=0),
                               legend=dict(orientation="h", yanchor="bottom", y=1.02),
@@ -467,7 +480,8 @@ def render_charts(df_lan_full, df_ent_full, df_lan_filt):
                          color="responsavel",
                          color_discrete_sequence=["#2563EB","#16A34A","#D97706","#7C3AED"],
                          text=[fmt_brl(v) for v in per["valor"]])
-            fig.update_traces(textposition="outside", textfont_size=10)
+            fig.update_traces(textposition="inside", insidetextanchor="middle",
+                              textfont=dict(size=10, color="white"))
             fig.update_layout(height=220, showlegend=False,
                               margin=dict(l=0, r=0, t=8, b=0),
                               paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
