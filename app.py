@@ -133,12 +133,28 @@ def _find_ws(wss: dict, *keywords):
     return None
 
 def _ws_to_df(ws) -> pd.DataFrame:
+    """Lê a planilha sem quebrar com cabeçalhos vazios ou duplicados."""
     if ws is None:
         return pd.DataFrame()
-    records = ws.get_all_records(numericise_ignore=["all"])
-    if not records:
+    values = ws.get_all_values()
+    if not values or len(values) < 2:
         return pd.DataFrame()
-    df = pd.DataFrame(records)
+
+    # Torna os cabeçalhos únicos (resolve colunas vazias ou duplicadas)
+    raw_headers = values[0]
+    seen: dict = {}
+    headers = []
+    for h in raw_headers:
+        h = h.strip()
+        if h == "" or h in seen:
+            count = seen.get(h, 0) + 1
+            seen[h] = count
+            headers.append(f"{h}_{count}" if h else f"_vazio_{count}")
+        else:
+            seen[h] = 0
+            headers.append(h)
+
+    df = pd.DataFrame(values[1:], columns=headers)
     # Remove linhas completamente vazias
     df = df[df.apply(lambda r: r.astype(str).str.strip().ne("").any(), axis=1)]
     return df
