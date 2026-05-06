@@ -469,14 +469,15 @@ def render_charts(df_lan_full, df_ent_full, df_lan_filt):
                         marker_color="#16A34A", opacity=0.85, marker_line_width=0,
                         text=[fmt_brl(v) for v in dh["Entradas"]],
                         textposition="inside", insidetextanchor="middle",
-                        textfont=dict(size=10, color="white"))
+                        textfont=dict(size=13, color="white"))
             fig.add_bar(x=dh["Mês"], y=dh["Gastos"],   name="Gastos/A Vencer",
                         marker_color="#DC2626", opacity=0.85, marker_line_width=0,
                         text=[fmt_brl(v) for v in dh["Gastos"]],
                         textposition="inside", insidetextanchor="middle",
-                        textfont=dict(size=10, color="white"))
+                        textfont=dict(size=13, color="white"))
             fig.update_layout(barmode="group", height=270,
                               margin=dict(l=0, r=0, t=40, b=0),
+                              uniformtext=dict(minsize=9, mode="hide"),
                               legend=dict(orientation="h", yanchor="bottom", y=1.0,
                                           xanchor="center", x=0.5),
                               paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
@@ -516,9 +517,10 @@ def render_charts(df_lan_full, df_ent_full, df_lan_filt):
                          color_discrete_sequence=["#2563EB","#16A34A","#D97706","#7C3AED"],
                          text=[fmt_brl(v) for v in per["valor"]])
             fig.update_traces(textposition="inside", insidetextanchor="middle",
-                              textfont=dict(size=10, color="white"))
+                              textfont=dict(size=13, color="white"))
             fig.update_layout(height=220, showlegend=False,
                               margin=dict(l=0, r=0, t=8, b=0),
+                              uniformtext=dict(minsize=9, mode="hide"),
                               paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
             fig.update_xaxes(tickprefix="R$ ", showgrid=False, tickfont_size=11)
             fig.update_yaxes(showgrid=False, tickfont_size=11)
