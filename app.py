@@ -530,16 +530,16 @@ def main():
             )
 
     # Pipeline
-    selected_month = make_sidebar()
     df_lan = process_lancamentos(df_lan_raw)
     df_ent = process_entradas(df_ent_raw)
-    df_lan, df_ent = apply_filters(df_lan, df_ent, selected_month)
+    sel_months, sel_status, sel_cats = make_sidebar(df_lan, df_ent)
+    df_lan_f, df_ent_f = apply_filters(df_lan, df_ent, sel_months, sel_status, sel_cats)
 
-    render_kpis(df_lan, df_ent)
-    render_charts(df_lan)
-    render_alerts(df_lan)
-    render_paid(df_lan)
-    render_entries(df_ent)
+    render_kpis(df_lan_f, df_ent_f, df_lan, df_ent, sel_months)
+    render_charts(df_lan, df_ent, df_lan_f)
+    render_alerts(df_lan_f)
+    render_paid(df_lan_f)
+    render_entries(df_ent_f)
 
     tz_info = loaded_at.strftime("%d/%m/%Y %H:%M:%S")
     st.caption(f"Dados atualizados em: {tz_info}")
