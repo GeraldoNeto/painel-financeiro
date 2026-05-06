@@ -532,7 +532,7 @@ def main():
             if not df_ent_raw.empty:
                 cols_ent = " | ".join(df_ent_raw.columns.tolist())
                 st.markdown(f"**Colunas Entradas:** {cols_ent}")
-            )
+            
 
     # Pipeline
     df_lan = process_lancamentos(df_lan_raw)
