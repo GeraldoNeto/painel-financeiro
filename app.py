@@ -68,12 +68,23 @@ thead tr th { background: #F8FAFC !important; font-size: 11px !important;
         justify-content: center !important;
         text-align: center !important;
     }
-    [data-testid="stMetricLabel"] {
+    /* Forçar centralização em todos os filhos do card */
+    div[data-testid="metric-container"] * {
+        text-align: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+    }
+    [data-testid="stMetricLabel"],
+    [data-testid="stMetricLabel"] > div,
+    [data-testid="stMetricLabel"] p,
+    [data-testid="stMetricLabel"] label {
         font-size: 0.62rem !important;
         text-align: center !important;
         width: 100% !important;
+        display: block !important;
     }
-    [data-testid="stMetricValue"] {
+    [data-testid="stMetricValue"],
+    [data-testid="stMetricValue"] > div {
         font-size: 1.0rem !important;
         text-align: center !important;
         width: 100% !important;
@@ -83,6 +94,7 @@ thead tr th { background: #F8FAFC !important; font-size: 11px !important;
         text-align: center !important;
         justify-content: center !important;
         width: 100% !important;
+        display: flex !important;
     }
 
     /* Sidebar: largura menor para não sobrepor o conteúdo */
