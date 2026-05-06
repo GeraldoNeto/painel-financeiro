@@ -39,24 +39,51 @@ thead tr th { background: #F8FAFC !important; font-size: 11px !important;
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
-    /* KPI cards: 2 por linha, centralizados */
+    /* Reduzir padding lateral geral */
+    .block-container { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+
+    /* Título menor e centralizado */
+    h1 { font-size: 1.3rem !important; text-align: center !important; }
+
+    /* KPI cards: 2 por linha, sem gaps excessivos */
     div[data-testid="stHorizontalBlock"] {
         flex-wrap: wrap !important;
-        gap: 8px !important;
+        gap: 6px !important;
         justify-content: center !important;
+        padding: 0 !important;
     }
     div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] {
-        min-width: calc(48% - 4px) !important;
-        max-width: calc(48% - 4px) !important;
-        flex: 1 1 calc(48% - 4px) !important;
+        min-width: calc(50% - 6px) !important;
+        max-width: calc(50% - 6px) !important;
+        flex: 1 1 calc(50% - 6px) !important;
+        padding: 0 !important;
     }
+
+    /* Card centralizado com flexbox */
     div[data-testid="metric-container"] {
+        padding: 10px 6px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
         text-align: center !important;
-        padding: 10px 8px !important;
     }
-    [data-testid="stMetricValue"]  { font-size: 1.0rem !important; }
-    [data-testid="stMetricLabel"]  { font-size: 0.63rem !important; }
-    [data-testid="stMetricDelta"]  { font-size: 0.72rem !important; justify-content: center !important; }
+    [data-testid="stMetricLabel"] {
+        font-size: 0.62rem !important;
+        text-align: center !important;
+        width: 100% !important;
+    }
+    [data-testid="stMetricValue"] {
+        font-size: 1.0rem !important;
+        text-align: center !important;
+        width: 100% !important;
+    }
+    [data-testid="stMetricDelta"] {
+        font-size: 0.70rem !important;
+        text-align: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+    }
 
     /* Sidebar: largura menor para não sobrepor o conteúdo */
     section[data-testid="stSidebar"] { min-width: 210px !important; max-width: 210px !important; }
@@ -66,16 +93,11 @@ thead tr th { background: #F8FAFC !important; font-size: 11px !important;
         min-width: 100% !important;
         max-width: 100% !important;
         flex: 1 1 100% !important;
+        padding: 0 !important;
     }
-
-    /* Título menor */
-    h1 { font-size: 1.3rem !important; text-align: center !important; }
 
     /* Tabelas: scroll horizontal */
     div[data-testid="stDataFrame"] { overflow-x: auto !important; }
-
-    /* Reduzir padding lateral geral */
-    .block-container { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -442,8 +464,9 @@ def render_charts(df_lan_full, df_ent_full, df_lan_filt):
                         textposition="inside", insidetextanchor="middle",
                         textfont=dict(size=10, color="white"))
             fig.update_layout(barmode="group", height=270,
-                              margin=dict(l=0, r=0, t=8, b=0),
-                              legend=dict(orientation="h", yanchor="bottom", y=1.02),
+                              margin=dict(l=0, r=0, t=40, b=0),
+                              legend=dict(orientation="h", yanchor="bottom", y=1.0,
+                                          xanchor="center", x=0.5),
                               paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
             fig.update_yaxes(tickprefix="R$ ", gridcolor="#F1F5F9", tickfont_size=11)
             fig.update_xaxes(showgrid=False, tickfont_size=11)
