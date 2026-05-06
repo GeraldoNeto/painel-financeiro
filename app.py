@@ -517,8 +517,8 @@ def main():
             st.stop()
 
     # ── Diagnóstico (visível sempre que algum dado não for encontrado) ──
-    # Diagnostico
-        with st.expander("Diagnostico de conexao", expanded=True):
+# Diagnostico
+    with st.expander("Diagnostico de conexao", expanded=True):
         col_a, col_b = st.columns(2)
         with col_a:
             abas = " | ".join(sheet_names)
