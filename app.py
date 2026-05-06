@@ -165,10 +165,17 @@ def load_data():
     ss     = client.open_by_key(SPREADSHEET_ID)
     wss    = {ws.title: ws for ws in ss.worksheets()}
 
-    df_lan = _ws_to_df(_find_ws(wss, "lançamento", "lancamento"))
-    df_ent = _ws_to_df(_find_ws(wss, "entrada"))
+    ws_lan = _find_ws(wss, "lançamento", "lancamento")
+    ws_ent = _find_ws(wss, "entrada")
 
-    return df_lan, df_ent, datetime.now()
+    df_lan = _ws_to_df(ws_lan)
+    df_ent = _ws_to_df(ws_ent)
+
+    sheet_names  = list(wss.keys())
+    lan_name     = ws_lan.title if ws_lan else None
+    ent_name     = ws_ent.title if ws_ent else None
+
+    return df_lan, df_ent, datetime.now(), sheet_names, lan_name, ent_name
 
 # ─── TRANSFORMAÇÃO DOS DADOS ──────────────────────────────────────────────────
 def _col(df: pd.DataFrame, *tests) -> str:
@@ -502,16 +509,26 @@ def main():
 
     with st.spinner("Buscando dados do Google Sheets…"):
         try:
-            df_lan_raw, df_ent_raw, loaded_at = load_data()
+            df_lan_raw, df_ent_raw, loaded_at, sheet_names, lan_name, ent_name = load_data()
         except Exception as e:
             st.error(f"Erro ao conectar ao Google Sheets: {e}")
             st.info("Verifique se as credenciais estão corretas em `.streamlit/secrets.toml` "
                     "e se a planilha foi compartilhada com o e-mail da conta de serviço.")
             st.stop()
 
+    # ── Diagnóstico (visível sempre que algum dado não for encontrado) ──
+    with st.expander("🔧 Diagnóstico de conexão", expanded=(df_lan_raw.empty or df_ent_raw.empty)):
+        st.markdown(f"**Abas encontradas na planilha:** `{'` · `'.join(sheet_names)}`")
+        st.markdown(f"**Aba usada para Lançamentos:** `{lan_name or '❌ não encontrada'}`  "
+                    f"— {len(df_lan_raw)} linhas")
+        st.markdown(f"**Aba usada para Entradas:** `{ent_name or '❌ não encontrada'}`  "
+                    f"— {len(df_ent_raw)} linhas")
+        if df_lan_raw.empty or df_ent_raw.empty:
+            st.warning("Uma ou mais abas nao foram encontradas. Informe os nomes das abas listados acima.")
+
     if df_lan_raw.empty and df_ent_raw.empty:
         st.error("Planilha carregada, mas nenhum dado encontrado. "
-                 "Verifique se as abas 'Lançamentos' e 'Entradas' existem e têm dados.")
+                 "Veja o diagnóstico acima.")
         st.stop()
 
     df_lan = process_lancamentos(df_lan_raw)
