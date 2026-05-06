@@ -524,37 +524,25 @@ def main():
         st.markdown(f"**Aba usada para Entradas:** `{ent_name or '❌ não encontrada'}`  "
                     f"— {len(df_ent_raw)} linhas")
         if df_lan_raw.empty or df_ent_raw.empty:
-            st.warning("Uma ou mais abas nao foram encontradas. Informe os nomes das abas listados acima.")
+            st.warning(
+                "Aba nao encontrada. Confira os nomes acima e atualize"
+                " o codigo para usar o nome correto."
+            )
 
-    if df_lan_raw.empty and df_ent_raw.empty:
-        st.error("Planilha carregada, mas nenhum dado encontrado. "
-                 "Veja o diagnóstico acima.")
-        st.stop()
-
+    # Pipeline
+    selected_month = make_sidebar()
     df_lan = process_lancamentos(df_lan_raw)
     df_ent = process_entradas(df_ent_raw)
+    df_lan, df_ent = apply_filters(df_lan, df_ent, selected_month)
 
-    st.caption(
-        f"📊 Geraldo Neto · Planilha_Financeira_2026_2030 · "
-        f"Atualizado: {loaded_at.strftime('%d/%m/%Y %H:%M:%S')}"
-    )
+    render_kpis(df_lan, df_ent)
+    render_charts(df_lan)
+    render_alerts(df_lan)
+    render_paid(df_lan)
+    render_entries(df_ent)
 
-    sel_months, sel_status, sel_cats = make_sidebar(df_lan, df_ent)
-    df_lan_filt, df_ent_filt = apply_filters(df_lan, df_ent, sel_months, sel_status, sel_cats)
-
-    render_kpis(df_lan_filt, df_ent_filt, df_lan, df_ent, sel_months)
-
-    st.divider()
-    render_charts(df_lan, df_ent, df_lan_filt)
-
-    st.divider()
-    render_alerts(df_lan_filt)
-
-    st.divider()
-    render_paid(df_lan_filt)
-
-    st.divider()
-    render_entries(df_ent_filt)
+    tz_info = loaded_at.strftime("%d/%m/%Y %H:%M:%S")
+    st.caption(f"Dados atualizados em: {tz_info}")
 
 
 if __name__ == "__main__":
