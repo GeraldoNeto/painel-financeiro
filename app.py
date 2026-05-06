@@ -78,19 +78,19 @@ thead tr th { background: #F8FAFC !important; font-size: 11px !important;
     [data-testid="stMetricLabel"] > div,
     [data-testid="stMetricLabel"] p,
     [data-testid="stMetricLabel"] label {
-        font-size: 0.62rem !important;
+        font-size: 0.78rem !important;
         text-align: center !important;
         width: 100% !important;
         display: block !important;
     }
     [data-testid="stMetricValue"],
     [data-testid="stMetricValue"] > div {
-        font-size: 1.0rem !important;
+        font-size: 1.45rem !important;
         text-align: center !important;
         width: 100% !important;
     }
     [data-testid="stMetricDelta"] {
-        font-size: 0.70rem !important;
+        font-size: 0.80rem !important;
         text-align: center !important;
         justify-content: center !important;
         width: 100% !important;
@@ -482,7 +482,7 @@ def render_charts(df_lan_full, df_ent_full, df_lan_filt):
                               paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
             fig.update_yaxes(tickprefix="R$ ", gridcolor="#F1F5F9", tickfont_size=11)
             fig.update_xaxes(showgrid=False, tickfont_size=11)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
     # Gastos por categoria (donut)
     with col2:
@@ -501,7 +501,7 @@ def render_charts(df_lan_full, df_ent_full, df_lan_filt):
             fig.update_layout(height=270, margin=dict(l=0, r=0, t=8, b=0),
                               legend=dict(font_size=11),
                               paper_bgcolor="rgba(0,0,0,0)")
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
     col3, col4 = st.columns(2)
 
@@ -522,7 +522,7 @@ def render_charts(df_lan_full, df_ent_full, df_lan_filt):
                               paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
             fig.update_xaxes(tickprefix="R$ ", showgrid=False, tickfont_size=11)
             fig.update_yaxes(showgrid=False, tickfont_size=11)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
     # Evolução do saldo
     with col4:
@@ -553,7 +553,7 @@ def render_charts(df_lan_full, df_ent_full, df_lan_filt):
                               paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
             fig.update_yaxes(tickprefix="R$ ", gridcolor="#F1F5F9", tickfont_size=11)
             fig.update_xaxes(showgrid=False, tickfont_size=11)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
 # ─── TABELA: ALERTAS DE VENCIMENTO ───────────────────────────────────────────
 def render_alerts(df_lan: pd.DataFrame):
@@ -607,8 +607,62 @@ def render_entries(df_ent: pd.DataFrame):
     disp.columns = ["Data", "Responsável", "Banco", "Valor"]
     st.dataframe(disp, use_container_width=True, hide_index=True)
 
+# ─── BANNER DE ALERTA ────────────────────────────────────────────────────────
+def render_alert_banner(df_lan: pd.DataFrame):
+    pend     = df_lan[df_lan["pago"].str.lower() != "sim"]
+    vencidas = pend[pend["dias"] < 0].sort_values("dias")
+    proximas = pend[(pend["dias"] >= 0) & (pend["dias"] <= 5)].sort_values("dias")
+
+    if vencidas.empty and proximas.empty:
+        return
+
+    blocks = []
+
+    if not vencidas.empty:
+        itens = "".join(
+            f"<li><strong>{r['descricao']}</strong> &mdash; {fmt_brl(r['valor'])}"
+            f"<span style='opacity:.75'> ({abs(int(r['dias']))}d atrás)</span></li>"
+            for _, r in vencidas.iterrows()
+        )
+        blocks.append(f"""
+        <div style='background:#450a0a;border-left:5px solid #ef4444;border-radius:10px;
+                    padding:14px 18px;margin-bottom:10px;'>
+          <div style='color:#fca5a5;font-size:0.92rem;font-weight:800;
+                      letter-spacing:.03em;margin-bottom:8px;'>
+            🔴 {len(vencidas)} conta(s) VENCIDA(S)
+          </div>
+          <ul style='color:#fecaca;font-size:0.85rem;margin:0;
+                     padding-left:20px;line-height:1.8;'>{itens}</ul>
+        </div>""")
+
+    if not proximas.empty:
+        itens = "".join(
+            f"<li><strong>{r['descricao']}</strong> &mdash; {fmt_brl(r['valor'])}"
+            f"<span style='opacity:.75'> ({'Hoje' if r['dias'] == 0 else str(int(r['dias'])) + 'd'})</span></li>"
+            for _, r in proximas.iterrows()
+        )
+        blocks.append(f"""
+        <div style='background:#431407;border-left:5px solid #f97316;border-radius:10px;
+                    padding:14px 18px;margin-bottom:10px;'>
+          <div style='color:#fdba74;font-size:0.92rem;font-weight:800;
+                      letter-spacing:.03em;margin-bottom:8px;'>
+            ⚠️ {len(proximas)} conta(s) vencem em até 5 dias
+          </div>
+          <ul style='color:#fed7aa;font-size:0.85rem;margin:0;
+                     padding-left:20px;line-height:1.8;'>{itens}</ul>
+        </div>""")
+
+    st.markdown(
+        f"<div style='margin-bottom:4px;'>{''.join(blocks)}</div>",
+        unsafe_allow_html=True,
+    )
+
+
 # ─── MAIN ─────────────────────────────────────────────────────────────────────
 def main():
+    # Reserva espaço para o banner antes do título
+    banner_slot = st.empty()
+
     st.markdown("<h1 style='text-align:center'>💰 Painel Financeiro Pessoal</h1>", unsafe_allow_html=True)
 
     with st.spinner("Buscando dados do Google Sheets…"):
@@ -619,15 +673,16 @@ def main():
             st.info("Verifique se as credenciais estão corretas em `.streamlit/secrets.toml` "
                     "e se a planilha foi compartilhada com o e-mail da conta de serviço.")
             st.stop()
-    """
 
-
-    """
     # Pipeline
     df_lan = process_lancamentos(df_lan_raw)
     df_ent = process_entradas(df_ent_raw)
     sel_months, sel_status, sel_cats = make_sidebar(df_lan, df_ent)
     df_lan_f, df_ent_f = apply_filters(df_lan, df_ent, sel_months, sel_status, sel_cats)
+
+    # Preenche o banner com dados de TODOS os lançamentos (não apenas o filtro)
+    with banner_slot.container():
+        render_alert_banner(df_lan)
 
     render_kpis(df_lan_f, df_ent_f, df_lan, df_ent, sel_months)
     render_charts(df_lan, df_ent, df_lan_f)
