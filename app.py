@@ -421,9 +421,13 @@ def render_charts(df_lan_full, df_ent_full, df_lan_filt):
             dh = pd.DataFrame(rows)
             fig = go.Figure()
             fig.add_bar(x=dh["Mês"], y=dh["Entradas"], name="Entradas",
-                        marker_color="#16A34A", opacity=0.85, marker_line_width=0)
+                        marker_color="#16A34A", opacity=0.85, marker_line_width=0,
+                        text=[fmt_brl(v) for v in dh["Entradas"]], textposition="outside",
+                        textfont=dict(size=10))
             fig.add_bar(x=dh["Mês"], y=dh["Gastos"],   name="Gastos/A Vencer",
-                        marker_color="#DC2626", opacity=0.85, marker_line_width=0)
+                        marker_color="#DC2626", opacity=0.85, marker_line_width=0,
+                        text=[fmt_brl(v) for v in dh["Gastos"]], textposition="outside",
+                        textfont=dict(size=10))
             fig.update_layout(barmode="group", height=270,
                               margin=dict(l=0, r=0, t=8, b=0),
                               legend=dict(orientation="h", yanchor="bottom", y=1.02),
@@ -461,7 +465,9 @@ def render_charts(df_lan_full, df_ent_full, df_lan_filt):
         if not per.empty:
             fig = px.bar(per, x="valor", y="responsavel", orientation="h",
                          color="responsavel",
-                         color_discrete_sequence=["#2563EB","#16A34A","#D97706","#7C3AED"])
+                         color_discrete_sequence=["#2563EB","#16A34A","#D97706","#7C3AED"],
+                         text=[fmt_brl(v) for v in per["valor"]])
+            fig.update_traces(textposition="outside", textfont_size=10)
             fig.update_layout(height=220, showlegend=False,
                               margin=dict(l=0, r=0, t=8, b=0),
                               paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
@@ -510,13 +516,13 @@ def render_alerts(df_lan: pd.DataFrame):
         st.success("✅ Nenhum vencimento pendente no período selecionado.")
         return
 
-    disp = pend[["status","descricao","categoria","vencimento","dias","valor","forma"]].copy()
+    disp = pend[["status","dias","descricao","valor","vencimento","categoria"]].copy()
     disp["status"] = disp["status"].map(STATUS_LABEL).fillna(disp["status"])
     disp["valor"]  = disp["valor"].apply(fmt_brl)
     disp["dias"]   = disp["dias"].apply(
         lambda d: f"{abs(d)}d atrás" if d < 0 else ("Hoje" if d == 0 else f"{d}d")
     )
-    disp.columns = ["Status", "Descrição", "Categoria", "Vencimento", "Dias", "Valor", "Forma Pag."]
+    disp.columns = ["Status", "Dias", "Descrição", "Valor", "Vencimento", "Categoria"]
     st.dataframe(disp, use_container_width=True, hide_index=True)
 
 # ─── TABELA: CONTAS PAGAS ────────────────────────────────────────────────────
@@ -532,9 +538,9 @@ def render_paid(df_lan: pd.DataFrame):
         st.info("Nenhuma conta paga no período selecionado.")
         return
 
-    disp = pagos[["descricao","categoria","vencimento","data_pagamento","valor","banco_pago","observacoes"]].copy()
+    disp = pagos[["descricao","vencimento","data_pagamento","valor","banco_pago","observacoes","categoria"]].copy()
     disp["valor"] = disp["valor"].apply(fmt_brl)
-    disp.columns = ["Descrição","Categoria","Vencimento","Data Pagamento","Valor","Banco (Pago)","Observações"]
+    disp.columns = ["Descrição","Vencimento","Data Pagamento","Valor","Banco (Pago)","Observações","Categoria"]
     st.dataframe(disp, use_container_width=True, hide_index=True)
 
 # ─── TABELA: ENTRADAS ────────────────────────────────────────────────────────
@@ -554,7 +560,7 @@ def render_entries(df_ent: pd.DataFrame):
 
 # ─── MAIN ─────────────────────────────────────────────────────────────────────
 def main():
-    st.title("💰 Painel Financeiro Pessoal")
+    st.markdown("<h1 style='text-align:center'>💰 Painel Financeiro Pessoal</h1>", unsafe_allow_html=True)
 
     with st.spinner("Buscando dados do Google Sheets…"):
         try:
