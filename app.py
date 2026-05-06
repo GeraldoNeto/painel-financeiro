@@ -36,6 +36,36 @@ div[data-testid="metric-container"] {
 }
 thead tr th { background: #F8FAFC !important; font-size: 11px !important;
               text-transform: uppercase; letter-spacing: .05em; }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+    /* KPI cards: 2 por linha */
+    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] {
+        min-width: 46% !important;
+        flex: 1 1 46% !important;
+    }
+    [data-testid="stMetricValue"] { font-size: 1.1rem !important; }
+    [data-testid="stMetricLabel"] { font-size: 0.68rem !important; }
+    div[data-testid="metric-container"] { padding: 12px 12px; }
+
+    /* Sidebar: largura menor para não sobrepor o conteúdo */
+    section[data-testid="stSidebar"] { min-width: 220px !important; max-width: 220px !important; }
+
+    /* Gráficos: empilhar verticalmente */
+    div[data-testid="stHorizontalBlock"]:has(div[data-testid="stPlotlyChart"]) {
+        flex-wrap: wrap !important;
+    }
+    div[data-testid="stHorizontalBlock"]:has(div[data-testid="stPlotlyChart"]) > div[data-testid="stColumn"] {
+        min-width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+
+    /* Título menor */
+    h1 { font-size: 1.4rem !important; }
+
+    /* Tabelas: scroll horizontal */
+    div[data-testid="stDataFrame"] { overflow-x: auto !important; }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -324,12 +354,12 @@ def apply_filters(df_lan, df_ent, sel_months, sel_status, sel_cats):
 
 # ─── KPI CARDS ────────────────────────────────────────────────────────────────
 def render_kpis(df_lan, df_ent, df_lan_full, df_ent_full, sel_months):
-    pend = df_lan[df_lan["pago"].str.lower() != ""]
+    pend = df_lan[df_lan["pago"].str.lower() != "sim"]
     entradas   = df_ent["valor"].sum()
-    a_vencer   = pend["valor"].sum()
+    a_vencer   = df_lan["valor"].sum()
     saldo      = entradas - a_vencer
     vence_7    = pend[(pend["dias"] >= 0) & (pend["dias"] <= 7)]["valor"].sum()
-    cartao     = pend[pend["categoria"] == "Cartão"]["valor"].sum()
+    cartao     = df_lan[df_lan["categoria"] == "Cartão"]["valor"].sum()
 
     # Crescimento vs mês anterior (só com filtro de 1 mês)
     d_ent = d_av = d_sld = d_cart = None
