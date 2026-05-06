@@ -534,10 +534,7 @@ def main():
             st.info("Verifique se as credenciais estão corretas em `.streamlit/secrets.toml` "
                     "e se a planilha foi compartilhada com o e-mail da conta de serviço.")
             st.stop()
-    """
-    # Diagnostico
-    
-    """
+
     # Pipeline
     df_lan = process_lancamentos(df_lan_raw)
     df_ent = process_entradas(df_ent_raw)
