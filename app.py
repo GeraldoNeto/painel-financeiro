@@ -536,20 +536,7 @@ def main():
             st.stop()
     """
     # Diagnostico
-    with st.expander("Diagnostico de conexao", expanded=True):
-        col_a, col_b = st.columns(2)
-        with col_a:
-            abas = " | ".join(sheet_names)
-            st.markdown(f"**Abas na planilha:** {abas}")
-            st.markdown(f"**Lancamentos:** {lan_name or 'nao encontrada'} ({len(df_lan_raw)} linhas)")
-            st.markdown(f"**Entradas:** {ent_name or 'nao encontrada'} ({len(df_ent_raw)} linhas)")
-        with col_b:
-            if not df_lan_raw.empty:
-                cols_lan = " | ".join(df_lan_raw.columns.tolist())
-                st.markdown(f"**Colunas Lancamentos:** {cols_lan}")
-            if not df_ent_raw.empty:
-                cols_ent = " | ".join(df_ent_raw.columns.tolist())
-                st.markdown(f"**Colunas Entradas:** {cols_ent}")
+    
     """
     # Pipeline
     df_lan = process_lancamentos(df_lan_raw)
