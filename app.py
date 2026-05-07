@@ -43,7 +43,9 @@ thead tr th { background: #F8FAFC !important; font-size: 11px !important;
     .block-container { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
 
     /* Título centralizado e proporcionalmente maior que os KPIs (1.45rem) */
-    h1 { font-size: 1.65rem !important; text-align: center !important; font-weight: 800 !important; line-height: 1.2 !important; }
+    h1 { font-size: 1.65rem !important; text-align: center !important; font-weight: 800 !important; line-height: 1.2 !important; width: 100% !important; }
+    [data-testid="stMarkdown"]:has(h1) { width: 100% !important; }
+    [data-testid="stMarkdown"]:has(h1) > div { width: 100% !important; display: flex !important; justify-content: center !important; }
 
     /* KPI cards: 2 por linha, sem gaps excessivos */
     div[data-testid="stHorizontalBlock"] {
@@ -665,7 +667,7 @@ def main():
     # Reserva espaço para o banner antes do título
     banner_slot = st.empty()
 
-    st.markdown("<h1 style='text-align:center; width:100%; display:block'>💰 Painel Financeiro Pessoal 💰</h1>", unsafe_allow_html=True)
+    st.markdown("<div style='display:flex;justify-content:center;width:100%;'><h1 style='text-align:center;margin:0;'>💰 Painel Financeiro Pessoal 💰</h1></div>", unsafe_allow_html=True)
     st.markdown("<div style='margin-bottom: 2rem'></div>", unsafe_allow_html=True)
 
     with st.spinner("Buscando dados do Google Sheets…"):
