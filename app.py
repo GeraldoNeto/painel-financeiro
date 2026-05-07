@@ -665,7 +665,7 @@ def main():
     # Reserva espaço para o banner antes do título
     banner_slot = st.empty()
 
-    st.markdown("<h1 style='text-align:center'>💰 Painel Financeiro Pessoal 💰</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center; width:100%; display:block'>💰 Painel Financeiro Pessoal 💰</h1>", unsafe_allow_html=True)
     st.markdown("<div style='margin-bottom: 2rem'></div>", unsafe_allow_html=True)
 
     with st.spinner("Buscando dados do Google Sheets…"):
